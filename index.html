@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión de Productos</title>
+    <title>Sistema de Inventario</title>
     <style>
         * {
             margin: 0;
@@ -12,420 +12,1005 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* Estilos del Login */
+        .login-screen {
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 400px;
+            margin: 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            width: 40px;
+            height: 40px;
+            background: #5a67d8;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Credenciales flotantes */
+        .credentials-card {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 5;
+            min-width: 280px;
+        }
+
+        .credentials-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .credential-section {
+            margin-bottom: 1rem;
+        }
+
+        .credential-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .credential-role {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5a67d8;
+            margin-bottom: 0.5rem;
+        }
+
+        .credential-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.25rem 0;
+            font-size: 0.85rem;
+        }
+
+        .credential-label {
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        .credential-value {
+            color: #2d3748;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            background: #f7fafc;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Estilos del Dashboard */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+            background-color: #f7fafc;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #5a67d8;
+            color: white;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .menu-item:hover,
+        .menu-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .menu-item-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .logout-btn {
             width: 100%;
-            max-width: 1200px;
-            margin: 1rem;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
-        .login-container {
-            max-width: 400px;
-            margin: 0 auto;
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
         }
 
-        h1, h2 {
-            color: #333;
+        /* Contenido principal */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            background: none;
+            outline: none;
+            width: 100%;
+            padding: 0.25rem 0;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.5rem;
-            text-align: center;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #5a67d8;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4c51bf;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        /* Formularios */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .form-group {
             margin-bottom: 1.5rem;
         }
 
-        label {
+        .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #555;
             font-weight: 500;
+            color: #374151;
         }
 
-        input, select, textarea {
+        .form-input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
         }
 
-        input:focus, select:focus, textarea:focus {
+        .form-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
         }
 
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            margin: 0.5rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-            color: #212529;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2rem;
+        /* Tablas */
+        .table-container {
             background: white;
             border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        th, td {
-            padding: 12px;
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #e1e5e9;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 500;
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
         }
 
-        tr:hover {
-            background-color: #f8f9ff;
+        .table tbody tr:hover {
+            background: #f9fafb;
         }
 
-        .status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+        /* Badges de estado */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
             font-weight: 500;
             text-transform: uppercase;
+            letter-spacing: 0.025em;
         }
 
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
         }
 
-        .status-approved {
-            background: #d4edda;
-            color: #155724;
+        .badge-approved {
+            background: #d1fae5;
+            color: #065f46;
         }
 
-        .status-rejected {
-            background: #f8d7da;
-            color: #721c24;
+        .badge-rejected {
+            background: #fee2e2;
+            color: #991b1b;
         }
 
-        .header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
+        .badge-login {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-solicitud {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .badge-aprobacion {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rechazo {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-logout {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Cards de estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
         }
 
         .hidden {
             display: none !important;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background: #28a745;
-            color: white;
+        .success-message {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+            padding: 1rem;
             border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
+            margin-bottom: 1rem;
+            font-weight: 500;
         }
 
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-
+        /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-                margin: 0.5rem;
+            .credentials-card {
+                position: static;
+                margin: 1rem;
+                margin-bottom: 2rem;
             }
-            
-            .form-row {
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .search-box {
+                width: 200px;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            .form-grid {
                 grid-template-columns: 1fr;
             }
-            
-            table {
-                font-size: 14px;
-            }
-            
-            th, td {
-                padding: 8px;
-            }
+        }
+
+        .credential-value {
+            transition: all 0.2s ease;
+        }
+
+        .credential-value:hover {
+            background: #edf2f7;
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
     <!-- Pantalla de Login -->
-    <div id="loginScreen" class="container">
+    <div id="loginScreen" class="login-screen">
+        <!-- Tarjeta de credenciales flotante -->
+        <div class="credentials-card">
+            <div class="credentials-title">Credenciales de prueba</div>
+            
+            <div class="credential-section">
+                <div class="credential-role">Administrador</div>
+                <div class="credential-item">
+                    <span class="credential-label">Usuario:</span>
+                    <span class="credential-value">admin</span>
+                </div>
+                <div class="credential-item">
+                    <span class="credential-label">Contraseña:</span>
+                    <span class="credential-value">sistemas</span>
+                </div>
+            </div>
+
+            <div class="credential-section">
+                <div class="credential-role">Clientes</div>
+                <div class="credential-item">
+                    <span class="credential-label">Usuario:</span>
+                    <span class="credential-value">cliente</span>
+                </div>
+                <div class="credential-item">
+                    <span class="credential-label">Contraseña:</span>
+                    <span class="credential-value">sistemas</span>
+                </div>
+            </div>
+        </div>
+
         <div class="login-container">
-            <h1>Sistema de Gestión de Productos</h1>
+            <div class="login-header">
+                <div class="login-logo">📦</div>
+                <h1 class="login-title">Inventario</h1>
+                <p class="login-subtitle">Ingresa a tu cuenta para continuar</p>
+            </div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="userType">Tipo de Usuario:</label>
-                    <select id="userType" required>
+                    <label class="form-label">Tipo de Usuario</label>
+                    <select id="userType" class="form-input" required>
                         <option value="">Seleccionar tipo</option>
                         <option value="cliente">Cliente</option>
                         <option value="admin">Administrador</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="username">Usuario:</label>
-                    <input type="text" id="username" placeholder="Ingrese su usuario" required>
+                    <label class="form-label">Usuario</label>
+                    <input type="text" id="username" class="form-input" placeholder="Ingrese su usuario" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Contraseña:</label>
-                    <input type="password" id="password" placeholder="Ingrese su contraseña" required>
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" id="password" class="form-input" placeholder="Ingrese su contraseña" required>
                 </div>
-                <button type="submit" class="btn" style="width: 100%;">Iniciar Sesión</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Iniciar Sesión</button>
             </form>
         </div>
     </div>
 
-    <!-- Pantalla de Cliente -->
-    <div id="clientScreen" class="container hidden">
-        <div class="header">
-            <h2>Panel de Cliente</h2>
-            <div class="user-info">
-                <span id="clientName">Bienvenido, Cliente</span>
-                <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
+    <!-- Dashboard Principal -->
+    <div id="dashboard" class="dashboard">
+        <!-- Barra lateral -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <div class="sidebar-logo-icon">📦</div>
+                    <span class="sidebar-title">Inventario</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" onclick="showSection('dashboard')">
+                    <span class="menu-item-icon">📊</span>
+                    Dashboard
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('productos')" id="menuProductos">
+                    <span class="menu-item-icon">📦</span>
+                    Productos
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('solicitudes')" id="menuSolicitudes">
+                    <span class="menu-item-icon">📋</span>
+                    Solicitudes
+                </a>
+                <a href="#" class="menu-item" onclick="showSection('auditoria')" id="menuAuditoria">
+                    <span class="menu-item-icon">📝</span>
+                    Auditoría
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-details">
+                        <h4 id="userName">Usuario</h4>
+                        <p id="userRole">Administrador</p>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
             </div>
         </div>
 
-        <h3>Solicitar Producto</h3>
-        <form id="productForm">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="productName">Nombre del Producto:</label>
-                    <input type="text" id="productName" placeholder="Ej: Laptop Dell" required>
-                </div>
-                <div class="form-group">
-                    <label for="category">Categoría:</label>
-                    <select id="category" required>
-                        <option value="">Seleccionar categoría</option>
-                        <option value="Electrónicos">Electrónicos</option>
-                        <option value="Oficina">Oficina</option>
-                        <option value="Hogar">Hogar</option>
-                        <option value="Ropa">Ropa</option>
-                        <option value="Otros">Otros</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="quantity">Cantidad:</label>
-                    <input type="number" id="quantity" min="1" placeholder="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="price">Precio Unitario:</label>
-                    <input type="number" id="price" step="0.01" min="0" placeholder="0.00" required>
-                </div>
-                <div class="form-group">
-                    <label for="supplier">Proveedor:</label>
-                    <input type="text" id="supplier" placeholder="Nombre del proveedor" required>
-                </div>
-                <div class="form-group">
-                    <label for="date">Fecha Necesaria:</label>
-                    <input type="date" id="date" required>
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <div class="header">
+                <h1 class="header-title" id="pageTitle">Dashboard</h1>
+                <div class="search-box">
+                    <span>🔍</span>
+                    <input type="text" placeholder="Buscar..." style="margin-left: 0.5rem;">
+                    <span style="margin-left: auto;">🔔</span>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="description">Descripción:</label>
-                <textarea id="description" rows="3" placeholder="Descripción detallada del producto"></textarea>
-            </div>
-            <button type="submit" class="btn btn-success">Solicitar Producto</button>
-        </form>
 
-        <h3>Mis Solicitudes</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Categoría</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Proveedor</th>
-                    <th>Fecha</th>
-                    <th>Estado</th>
-                    <th>Fecha Solicitud</th>
-                </tr>
-            </thead>
-            <tbody id="clientRequestsTable">
-            </tbody>
-        </table>
-    </div>
+            <div class="content">
+                <!-- Sección Dashboard -->
+                <div id="dashboardSection" class="section">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalProducts">0</div>
+                            <div class="stat-label">Total Solicitudes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="pendingProducts">0</div>
+                            <div class="stat-label">Pendientes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="approvedProducts">0</div>
+                            <div class="stat-label">Aprobadas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="rejectedProducts">0</div>
+                            <div class="stat-label">Rechazadas</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <h3 style="margin-bottom: 1rem; color: #2d3748;">Información del Sistema</h3>
+                        <p style="color: #718096; line-height: 1.6;">
+                            Bienvenido al Sistema de Inventario. Desde aquí puedes gestionar las solicitudes de productos,
+                            revisar el historial de actividades y mantener un control completo del inventario.
+                        </p>
+                    </div>
+                </div>
 
-    <!-- Pantalla de Administrador -->
-    <div id="adminScreen" class="container hidden">
-        <div class="header">
-            <h2>Panel de Administrador</h2>
-            <div class="user-info">
-                <span id="adminName">Bienvenido, Administrador</span>
-                <button class="btn btn-danger" onclick="logout()">Cerrar Sesión</button>
+                <!-- Sección Productos/Solicitar -->
+                <div id="productosSection" class="section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Solicitar Producto</h2>
+                    </div>
+                    
+                    <div id="successMessage" class="success-message hidden">
+                        ✅ Solicitud enviada correctamente. El administrador podrá ver y gestionar su solicitud.
+                    </div>
+                    
+                    <form id="productForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Nombre del Producto</label>
+                                <input type="text" id="productName" class="form-input" placeholder="Ej: Laptop Dell" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Categoría</label>
+                                <select id="category" class="form-input" required>
+                                    <option value="">Seleccionar categoría</option>
+                                    <option value="Electrónicos">Electrónicos</option>
+                                    <option value="Oficina">Oficina</option>
+                                    <option value="Hogar">Hogar</option>
+                                    <option value="Ropa">Ropa</option>
+                                    <option value="Otros">Otros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Cantidad</label>
+                                <input type="number" id="quantity" class="form-input" min="1" placeholder="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Precio Unitario</label>
+                                <input type="number" id="price" class="form-input" step="0.01" min="0" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Proveedor</label>
+                                <input type="text" id="supplier" class="form-input" placeholder="Nombre del proveedor" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Fecha Necesaria</label>
+                                <input type="date" id="date" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Descripción</label>
+                            <textarea id="description" class="form-input" rows="3" placeholder="Descripción detallada del producto"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Solicitar Producto</button>
+                    </form>
+
+                    <div style="margin-top: 2rem;">
+                        <h3 class="section-title">Mis Solicitudes</h3>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Categoría</th>
+                                        <th>Cantidad</th>
+                                        <th>Precio</th>
+                                        <th>Proveedor</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Fecha Solicitud</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientRequestsTable">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Solicitudes -->
+                <div id="solicitudesSection" class="section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Gestionar Solicitudes</h2>
+                        <button class="btn btn-primary" onclick="exportData()">Exportar</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Proveedor</th>
+                                    <th>Fecha</th>
+                                    <th>Descripción</th>
+                                    <th>Estado</th>
+                                    <th>Fecha Solicitud</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminRequestsTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sección Auditoría -->
+                <div id="auditoriaSection" class="section hidden">
+                    <div class="section-header">
+                        <h2 class="section-title">Registro de Auditoría</h2>
+                        <button class="btn btn-primary" onclick="exportAudit()">Exportar</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha y Hora</th>
+                                    <th>Usuario</th>
+                                    <th>Acción</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalRequests">0</div>
-                <div>Total Solicitudes</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="pendingRequests">0</div>
-                <div>Pendientes</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="approvedRequests">0</div>
-                <div>Aprobadas</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="rejectedRequests">0</div>
-                <div>Rechazadas</div>
-            </div>
-        </div>
-
-        <h3>Gestionar Solicitudes de Productos</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Nombre</th>
-                    <th>Categoría</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Proveedor</th>
-                    <th>Fecha</th>
-                    <th>Descripción</th>
-                    <th>Estado</th>
-                    <th>Fecha Solicitud</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="adminRequestsTable">
-            </tbody>
-        </table>
     </div>
 
     <script>
-        // Simulación de base de datos en memoria
-        let products = JSON.parse(localStorage.getItem('products') || '[]');
+        // Base de datos global persistente - NO se resetea en logout
+        let globalProducts = [
+            {
+                id: 1694123456789,
+                client: 'cliente',
+                clientName: 'Juan Pérez',
+                name: 'Laptop Dell XPS 13',
+                category: 'Electrónicos',
+                quantity: 2,
+                price: 1200.00,
+                supplier: 'Dell Store',
+                date: '2024-10-15',
+                description: 'Laptop para el nuevo personal de desarrollo',
+                status: 'approved',
+                requestDate: '12/9/2024',
+                requestDateTime: '12/9/2024, 14:30:00'
+            },
+            {
+                id: 1694123456790,
+                client: 'cliente',
+                clientName: 'Juan Pérez',
+                name: 'Monitor 24 pulgadas',
+                category: 'Electrónicos',
+                quantity: 3,
+                price: 250.00,
+                supplier: 'Tech Solutions',
+                date: '2024-10-20',
+                description: 'Monitores adicionales para la oficina',
+                status: 'pending',
+                requestDate: '13/9/2024',
+                requestDateTime: '13/9/2024, 09:15:00'
+            }
+        ];
+        
+        let globalAuditLog = [
+            {
+                id: 1,
+                datetime: '12/9/2024, 21:14:56',
+                user: 'Administrador Sistema',
+                userType: 'Administrador Sistema',
+                action: 'LOGIN',
+                description: 'Inició sesión en el sistema'
+            },
+            {
+                id: 2,
+                datetime: '12/9/2024, 21:16:25',
+                user: 'Administrador Sistema',
+                userType: 'Administrador Sistema',
+                action: 'APROBACION',
+                description: 'Aprobó solicitud de 2 Laptop Dell XPS 13 para Juan Pérez'
+            },
+            {
+                id: 3,
+                datetime: '12/9/2024, 21:14:45',
+                user: 'Juan Pérez',
+                userType: 'Juan Pérez',
+                action: 'SOLICITUD',
+                description: 'Solicitó 2 Laptop Dell XPS 13 para nuevo personal'
+            },
+            {
+                id: 4,
+                datetime: '13/9/2024, 09:20:30',
+                user: 'Juan Pérez',
+                userType: 'Juan Pérez',
+                action: 'SOLICITUD',
+                description: 'Solicitó 3 Monitor 24 pulgadas para oficina'
+            }
+        ];
+        
+        // Variable de usuario actual
         let currentUser = null;
 
         // Usuarios predefinidos
         const users = {
-            'cliente': { password: '123', name: 'Cliente Usuario', type: 'cliente' },
-            'admin': { password: '123', name: 'Administrador', type: 'admin' }
+            'admin': { 
+                password: 'sistemas', 
+                name: 'Administrador Sistema', 
+                type: 'admin',
+                displayName: 'Admin'
+            },
+            'cliente': { 
+                password: 'sistemas', 
+                name: 'Juan Pérez', 
+                type: 'cliente',
+                displayName: 'Juan Pérez'
+            }
         };
+
+        // Agregar log de auditoría
+        function addAuditLog(action, description) {
+            const log = {
+                id: Date.now(),
+                datetime: new Date().toLocaleString('es-ES'),
+                date: new Date().toLocaleDateString('es-ES'),
+                time: new Date().toLocaleTimeString('es-ES'),
+                user: currentUser.name,
+                userType: currentUser.type === 'admin' ? 'Administrador Sistema' : currentUser.name,
+                action: action,
+                description: description
+            };
+            
+            globalAuditLog.unshift(log);
+            loadAuditLog();
+        }
 
         // Manejo del login
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const userType = document.getElementById('userType').value;
-            const username = document.getElementById('username').value;
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
 
             if (users[username] && users[username].password === password && users[username].type === userType) {
                 currentUser = { username, ...users[username] };
-                showScreen(userType);
-                showNotification('Inicio de sesión exitoso');
+                showDashboard();
+                addAuditLog('LOGIN', 'Inició sesión en el sistema');
             } else {
-                showNotification('Credenciales incorrectas', 'error');
+                alert('Credenciales incorrectas. Por favor, verifica los datos en la tarjeta de credenciales.');
             }
         });
 
-        // Función para mostrar pantallas
-        function showScreen(screen) {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('clientScreen').classList.add('hidden');
-            document.getElementById('adminScreen').classList.add('hidden');
-
-            if (screen === 'cliente') {
-                document.getElementById('clientScreen').classList.remove('hidden');
-                document.getElementById('clientName').textContent = `Bienvenido, ${currentUser.name}`;
-                loadClientRequests();
-            } else if (screen === 'admin') {
-                document.getElementById('adminScreen').classList.remove('hidden');
-                document.getElementById('adminName').textContent = `Bienvenido, ${currentUser.name}`;
-                loadAdminRequests();
-                updateStats();
+        // Mostrar dashboard
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            // Configurar interfaz según tipo de usuario
+            if (currentUser.type === 'cliente') {
+                document.getElementById('menuSolicitudes').style.display = 'none';
+                document.getElementById('menuAuditoria').style.display = 'none';
+                document.getElementById('menuProductos').innerHTML = '<span class="menu-item-icon">📋</span>Mis Solicitudes';
+                showSection('productos');
+            } else {
+                document.getElementById('menuProductos').style.display = 'none';
+                showSection('dashboard');
             }
+            
+            // Configurar información del usuario
+            document.getElementById('userName').textContent = currentUser.displayName || currentUser.name;
+            document.getElementById('userRole').textContent = currentUser.type === 'admin' ? 'Administrador' : 'Cliente';
+            document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            
+            updateStats();
+            loadAuditLog();
         }
 
-        // Manejo del formulario de productos (cliente)
+        // Mostrar secciones
+        function showSection(section) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            
+            // Remover active de menús
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            
+            // Mostrar sección seleccionada
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            
+            // Actualizar título
+            const titles = {
+                'dashboard': 'Dashboard',
+                'productos': currentUser && currentUser.type === 'cliente' ? 'Mis Solicitudes' : 'Productos',
+                'solicitudes': 'Solicitudes',
+                'auditoria': 'Auditoría'
+            };
+            document.getElementById('pageTitle').textContent = titles[section];
+            
+            // Activar menú correspondiente
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            
+            // Cargar datos según sección
+            if (section === 'productos' && currentUser && currentUser.type === 'cliente') {
+                loadClientRequests();
+            } else if (section === 'solicitudes') {
+                loadAdminRequests();
+            } else if (section === 'auditoria') {
+                loadAuditLog();
+            }
+            
+            updateStats();
+        }
+
+        // Manejo del formulario de productos
         document.getElementById('productForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -445,28 +1030,40 @@
                 requestDateTime: new Date().toLocaleString('es-ES')
             };
 
-            products.push(product);
-            localStorage.setItem('products', JSON.stringify(products));
+            globalProducts.push(product);
             
             this.reset();
-            showNotification('Producto solicitado exitosamente');
+            addAuditLog('SOLICITUD', `Solicitó ${product.quantity} ${product.name} para ${product.date}`);
             loadClientRequests();
+            updateStats();
+            
+            // Mostrar mensaje de éxito
+            const successMessage = document.getElementById('successMessage');
+            successMessage.classList.remove('hidden');
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+            }, 5000);
+            
+            console.log('Nueva solicitud agregada:', product);
+            console.log('Total de productos:', globalProducts.length);
         });
 
         // Cargar solicitudes del cliente
         function loadClientRequests() {
             const table = document.getElementById('clientRequestsTable');
-            const clientProducts = products.filter(p => p.client === currentUser.username);
+            if (!currentUser) return;
+            
+            const clientProducts = globalProducts.filter(p => p.client === currentUser.username);
             
             table.innerHTML = clientProducts.map(product => `
                 <tr>
                     <td>${product.name}</td>
                     <td>${product.category}</td>
                     <td>${product.quantity}</td>
-                    <td>$${product.price.toFixed(2)}</td>
+                    <td>${product.price.toFixed(2)}</td>
                     <td>${product.supplier}</td>
                     <td>${product.date}</td>
-                    <td><span class="status status-${product.status}">${getStatusText(product.status)}</span></td>
+                    <td><span class="badge badge-${product.status}">${getStatusText(product.status)}</span></td>
                     <td>${product.requestDate}</td>
                 </tr>
             `).join('');
@@ -476,65 +1073,81 @@
         function loadAdminRequests() {
             const table = document.getElementById('adminRequestsTable');
             
-            table.innerHTML = products.map(product => `
+            table.innerHTML = globalProducts.map(product => `
                 <tr>
                     <td>${product.clientName}</td>
                     <td>${product.name}</td>
                     <td>${product.category}</td>
                     <td>${product.quantity}</td>
-                    <td>$${product.price.toFixed(2)}</td>
+                    <td>${product.price.toFixed(2)}</td>
                     <td>${product.supplier}</td>
                     <td>${product.date}</td>
                     <td>${product.description}</td>
-                    <td><span class="status status-${product.status}">${getStatusText(product.status)}</span></td>
+                    <td><span class="badge badge-${product.status}">${getStatusText(product.status)}</span></td>
                     <td>${product.requestDate}</td>
                     <td>
                         ${product.status === 'pending' ? `
-                            <button class="btn btn-success" onclick="approveProduct(${product.id})" style="padding: 6px 12px; font-size: 12px;">Aprobar</button>
-                            <button class="btn btn-danger" onclick="rejectProduct(${product.id})" style="padding: 6px 12px; font-size: 12px;">Rechazar</button>
-                        ` : `<span class="status status-${product.status}">${getStatusText(product.status)}</span>`}
+                            <button class="btn btn-success" onclick="approveProduct(${product.id})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; margin-right: 0.25rem;">Aprobar</button>
+                            <button class="btn btn-danger" onclick="rejectProduct(${product.id})" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">Rechazar</button>
+                        ` : `<span class="badge badge-${product.status}">${getStatusText(product.status)}</span>`}
                     </td>
+                </tr>
+            `).join('');
+        }
+
+        // Cargar registro de auditoría
+        function loadAuditLog() {
+            const table = document.getElementById('auditTable');
+            
+            table.innerHTML = globalAuditLog.map(log => `
+                <tr>
+                    <td>${log.datetime}</td>
+                    <td>${log.userType}</td>
+                    <td><span class="badge badge-${log.action.toLowerCase()}">${log.action}</span></td>
+                    <td>${log.description}</td>
                 </tr>
             `).join('');
         }
 
         // Aprobar producto
         function approveProduct(id) {
-            const productIndex = products.findIndex(p => p.id === id);
+            const productIndex = globalProducts.findIndex(p => p.id === id);
             if (productIndex !== -1) {
-                products[productIndex].status = 'approved';
-                products[productIndex].approvedDate = new Date().toLocaleString('es-ES');
-                localStorage.setItem('products', JSON.stringify(products));
+                const product = globalProducts[productIndex];
+                globalProducts[productIndex].status = 'approved';
+                globalProducts[productIndex].approvedDate = new Date().toLocaleString('es-ES');
+                
+                addAuditLog('APROBACION', `Aprobó solicitud de ${product.quantity} ${product.name} para ${product.clientName}`);
                 loadAdminRequests();
                 updateStats();
-                showNotification('Producto aprobado exitosamente');
             }
         }
 
         // Rechazar producto
         function rejectProduct(id) {
-            const productIndex = products.findIndex(p => p.id === id);
+            const productIndex = globalProducts.findIndex(p => p.id === id);
             if (productIndex !== -1) {
-                products[productIndex].status = 'rejected';
-                products[productIndex].rejectedDate = new Date().toLocaleString('es-ES');
-                localStorage.setItem('products', JSON.stringify(products));
+                const product = globalProducts[productIndex];
+                globalProducts[productIndex].status = 'rejected';
+                globalProducts[productIndex].rejectedDate = new Date().toLocaleString('es-ES');
+                
+                addAuditLog('RECHAZO', `Rechazó solicitud de ${product.quantity} ${product.name} para ${product.clientName}`);
                 loadAdminRequests();
                 updateStats();
-                showNotification('Producto rechazado', 'warning');
             }
         }
 
         // Actualizar estadísticas
         function updateStats() {
-            const total = products.length;
-            const pending = products.filter(p => p.status === 'pending').length;
-            const approved = products.filter(p => p.status === 'approved').length;
-            const rejected = products.filter(p => p.status === 'rejected').length;
+            const total = globalProducts.length;
+            const pending = globalProducts.filter(p => p.status === 'pending').length;
+            const approved = globalProducts.filter(p => p.status === 'approved').length;
+            const rejected = globalProducts.filter(p => p.status === 'rejected').length;
 
-            document.getElementById('totalRequests').textContent = total;
-            document.getElementById('pendingRequests').textContent = pending;
-            document.getElementById('approvedRequests').textContent = approved;
-            document.getElementById('rejectedRequests').textContent = rejected;
+            document.getElementById('totalProducts').textContent = total;
+            document.getElementById('pendingProducts').textContent = pending;
+            document.getElementById('approvedProducts').textContent = approved;
+            document.getElementById('rejectedProducts').textContent = rejected;
         }
 
         // Obtener texto del estado
@@ -547,44 +1160,73 @@
             return statusMap[status] || status;
         }
 
-        // Mostrar notificación
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            
-            if (type === 'error') {
-                notification.style.background = '#dc3545';
-            } else if (type === 'warning') {
-                notification.style.background = '#ffc107';
-                notification.style.color = '#212529';
-            }
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
+        // Exportar datos
+        function exportData() {
+            const dataStr = JSON.stringify(globalProducts, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'solicitudes_productos.json';
+            link.click();
+            URL.revokeObjectURL(url);
         }
 
-        // Cerrar sesión
+        // Exportar auditoría
+        function exportAudit() {
+            const dataStr = JSON.stringify(globalAuditLog, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'registro_auditoria.json';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Cerrar sesión - SOLO resetea el usuario actual, NO los datos
         function logout() {
+            if (currentUser) {
+                addAuditLog('LOGOUT', 'Cerró sesión del sistema');
+            }
+            
+            // Solo resetear el usuario actual - NO los datos globales
             currentUser = null;
+            
+            // Limpiar formulario de login
             document.getElementById('loginForm').reset();
-            showScreen('login');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            showNotification('Sesión cerrada exitosamente');
+            
+            // Resetear visibilidad del menú para próximos logins
+            document.getElementById('menuProductos').style.display = 'block';
+            document.getElementById('menuSolicitudes').style.display = 'block';
+            document.getElementById('menuAuditoria').style.display = 'block';
+            
+            // Restaurar texto original del menú de productos
+            document.getElementById('menuProductos').innerHTML = '<span class="menu-item-icon">📦</span>Productos';
+            
+            // Remover clases active de menús
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Ocultar mensaje de éxito si está visible
+            document.getElementById('successMessage').classList.add('hidden');
+            
+            // Mostrar pantalla de login
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
         }
 
         // Configurar fecha mínima (hoy)
-        document.getElementById('date').min = new Date().toISOString().split('T')[0];
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('date');
+            if (dateInput) {
+                dateInput.min = new Date().toISOString().split('T')[0];
+            }
+            
+            // Cargar datos iniciales si ya están definidos
+            console.log('Sistema iniciado con:', globalProducts.length, 'productos y', globalAuditLog.length, 'registros de auditoría');
+        });
     </script>
 </body>
 </html>
